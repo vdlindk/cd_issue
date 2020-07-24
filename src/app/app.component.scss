@@ -1,0 +1,21 @@
+.error-msg {
+  background-color: rgba(255, 0, 0, 0.5);
+  padding: 0.3rem;
+  border: 1px solid red;
+}
+
+button {
+  background-color: #4caf50; /* Green */
+  border: none;
+  color: white;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+}
+
+:host {
+  > * {
+    margin: 0.3rem;
+  }
+}

@@ -1,50 +1,49 @@
-import { Component, OnDestroy } from '@angular/core';
-import { Observable, Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { Component } from '@angular/core';
+import { Observable } from 'rxjs';
 import { MyService } from './my.service';
 import { NotificationService } from './notification.service';
 
 @Component({
   selector: 'app-root',
   template: `
-    <div *ngIf="message$ | async as msg">
+    <div *ngIf="message$ | async as msg" class="error-msg">
       {{ msg }}
     </div>
-    <div *ngIf="notificationService.msg">
-      {{ notificationService.msg }}
+
+    <div *ngIf="result$ | async as result">
+      {{ result | json }}
     </div>
-    <div *ngIf="msg">
-      {{ msg }}
-    </div>
-    <pre *ngIf="result$ | async as result">{{ result | json }}</pre>
-    <button (click)="onClick()">trigger error</button>
-    <!--  <router-outlet></router-outlet> -->
+
+    <button (click)="triggerPlainError()">plain error</button>
+    <button (click)="triggerHttpError()">http error</button>
+    <button (click)="triggerRxjsError()">rxjs error</button>
   `,
   styleUrls: ['./app.component.scss'],
 })
-export class AppComponent implements OnDestroy {
-  private readonly destroy$ = new Subject<void>();
+export class AppComponent {
   readonly message$: Observable<string>;
   result$: Observable<any>;
-  msg: string;
 
   constructor(
-    readonly notificationService: NotificationService,
+    private readonly notificationService: NotificationService,
     private readonly myService: MyService
   ) {
     this.message$ = this.notificationService.message$;
 
-    this.message$.pipe(takeUntil(this.destroy$)).subscribe((v) => {
+    this.message$.subscribe((v) => {
       console.log('the message stream has been updated: ', v);
-      this.msg = v;
     });
   }
 
-  onClick() {
-    this.result$ = this.myService.my();
+  triggerHttpError() {
+    this.result$ = this.myService.httpError();
   }
-  ngOnDestroy() {
-    this.destroy$.next();
-    this.destroy$.complete();
+
+  triggerRxjsError() {
+    this.result$ = this.myService.rxjsError();
+  }
+
+  triggerPlainError() {
+    this.myService.plainError();
   }
 }
